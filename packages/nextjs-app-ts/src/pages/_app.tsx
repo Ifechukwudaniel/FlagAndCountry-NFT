@@ -29,12 +29,11 @@ const cache = createCache({ key: 'next' });
 console.log('init app...');
 
 // load saved theme
-const savedTheme = 'light';
+const savedTheme = 'dark';
 
 // setup themes for theme switcher
 const themes = {
   dark: './ant-dark-theme.css',
-  light: './ant-light-theme.css',
 };
 
 // create eth components context for options and API keys
@@ -49,7 +48,7 @@ const ProviderWrapper: FC<{ children?: ReactNode }> = (props) => {
     <EthComponentsSettingsContext.Provider value={ethComponentsSettings}>
       <EthersAppContext disableDefaultQueryClientRoot={true}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <ThemeSwitcherProvider themeMap={themes} defaultTheme={savedTheme ?? 'light'}>
+          <ThemeSwitcherProvider themeMap={themes} defaultTheme={savedTheme}>
             <ErrorBoundary FallbackComponent={ErrorFallback}>{props.children}</ErrorBoundary>
           </ThemeSwitcherProvider>
         </ErrorBoundary>
@@ -67,7 +66,7 @@ const ProviderWrapper: FC<{ children?: ReactNode }> = (props) => {
 const MyApp: NextComponentType<AppContext, AppInitialProps, AppProps> = ({ Component, ...props }) => {
   console.log('loading app...');
   const [queryClient] = useState(() => new QueryClient());
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
   const dehydradedState = props.pageProps.dehydratedState as unknown;
 
   return (
