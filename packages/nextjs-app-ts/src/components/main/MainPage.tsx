@@ -1,10 +1,12 @@
-import { GenericContract } from 'eth-components/ant/generic-contract';
-import { useContractReader, useBalance, useEthersAdaptorFromProviderOrSigners, useEventListener } from 'eth-hooks';
+import { GenericContract } from 'eth-components/ant';
+import { useEthersAdaptorFromProviderOrSigners } from 'eth-hooks';
 import { useEthersAppContext } from 'eth-hooks/context';
 import { useDexEthPrice } from 'eth-hooks/dapps';
 import { asEthersAdaptor } from 'eth-hooks/functions';
 import { NextPage } from 'next';
 import { ReactElement } from 'react';
+
+import { FlagAndCountry } from './FlagAndCountry';
 
 import { MainPageFooter, MainPageHeader, createTabsAndPages, TContractPageList } from '.';
 
@@ -12,7 +14,6 @@ import { useLoadAppContracts, useConnectAppContracts, useAppContracts } from '~c
 import { useCreateAntNotificationHolder } from '~common/components/hooks/useAntNotification';
 import { useBurnerFallback } from '~common/components/hooks/useBurnerFallback';
 import { useScaffoldAppProviders } from '~common/components/hooks/useScaffoldAppProviders';
-import { networkDefinitions } from '~common/constants';
 import { useScaffoldHooksExamples } from '~~/components/hooks/useScaffoldHooksExamples';
 import {
   AVAILABLE_NETWORKS_DEFINITIONS,
@@ -23,6 +24,7 @@ import {
   BURNER_FALLBACK_ENABLED,
 } from '~~/config/nextjsApp.config';
 import { TAppProps } from '~~/models/TAppProps';
+import {} from 'eth-components';
 
 /** ********************************
  * ⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️
@@ -93,68 +95,32 @@ export const MainPage: NextPage<IMainPageProps> = (props) => {
 
   // init contracts
   const yourContract = useAppContracts('YourContract', ethersAppContext.chainId);
-  const yourNFT = useAppContracts('YourNFT', ethersAppContext.chainId);
-  const mainnetDai = useAppContracts('DAI', networkDefinitions.mainnet.chainId);
+  const flagAndCountry = useAppContracts('FlagAndCountry', ethersAppContext.chainId);
 
-  // keep track of a variable from the contract in the local React state:
-  const [purpose, update] = useContractReader(
-    yourContract,
-    yourContract?.purpose,
-    [],
-    yourContract?.filters.SetPurpose()
-  );
-
-  // 📟 Listen for broadcast events
-  const [setPurposeEvents] = useEventListener(yourContract, 'SetPurpose', 0);
-
-  // -----------------------------
-  // .... 🎇 End of examples
-  // -----------------------------
-  // 💵 This hook will get the price of ETH from 🦄 Uniswap:
   const [ethPrice] = useDexEthPrice(
     scaffoldAppProviders.mainnetAdaptor?.provider,
     ethersAppContext.chainId !== 1 ? scaffoldAppProviders.currentTargetNetwork : undefined
   );
 
-  // 💰 this hook will get your balance
-  const [yourCurrentBalance] = useBalance(ethersAppContext.account);
-
-  // -----------------------------
-  // 📃 App Page List
-  // -----------------------------
-  // This is the list of tabs and their contents
   const pageList: TContractPageList = {
     mainPage: {
-      name: 'YourContract',
+      name: 'Flag And Country',
       content: (
-        <GenericContract
-          contractName="YourContract"
-          contract={yourContract}
-          mainnetAdaptor={scaffoldAppProviders.mainnetAdaptor}
+        <FlagAndCountry
+          mainnetProvider={MAINNET_PROVIDER}
           blockExplorer={scaffoldAppProviders.currentTargetNetwork.blockExplorer}
         />
       ),
     },
     pages: [
       {
-        name: 'YourNFT',
+        name: 'Smart-Contract',
         content: (
           <GenericContract
-            contractName="YourNFT"
-            contract={yourNFT}
+            contractName="Flag And Country"
+            contract={flagAndCountry}
             mainnetAdaptor={scaffoldAppProviders.mainnetAdaptor}
             blockExplorer={scaffoldAppProviders.currentTargetNetwork.blockExplorer}></GenericContract>
-        ),
-      },
-      {
-        name: 'Mainnet-Dai',
-        content: (
-          <GenericContract
-            contractName="Dai"
-            contract={mainnetDai}
-            mainnetAdaptor={scaffoldAppProviders.mainnetAdaptor}
-            blockExplorer={scaffoldAppProviders.currentTargetNetwork.blockExplorer}
-          />
         ),
       },
     ],
@@ -169,7 +135,7 @@ export const MainPage: NextPage<IMainPageProps> = (props) => {
   return (
     <div>
       <MainPageHeader scaffoldAppProviders={scaffoldAppProviders} price={ethPrice} appProps={appProps} />
-      {tabMenu}
+      <div>{tabMenu}</div>
       {pages[props.pageName] ?? RouteNotFound}
       <MainPageFooter scaffoldAppProviders={scaffoldAppProviders} price={ethPrice} appProps={appProps} />
       <div className="absolute bg-slate-600">{notificationHolder}</div>
